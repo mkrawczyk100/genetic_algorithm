@@ -1,5 +1,7 @@
 # Algorytm genetyczny
 
+Projekt wykonany na przedmiot Podstawy Programowania w Pythonie przez Mateusza Krawczyka oraz Natalię Madej.
+
 ## Wprowadzenie
 
 [Algorytmy genetyczne](https://en.wikipedia.org/wiki/Genetic_algorithm) (AG) to rodzaj heurystyki optymalizacyjnej opartej na mechanizmach [dziedziczenia genetycznego](https://en.wikipedia.org/wiki/Evolutionary_algorithm) i inspirowanej teorią ewolucji naturalnej Karola Darwina. Są one często stosowane do rozwiązywania problemów optymalizacyjnych, szczególnie w sytuacjach, gdzie tradycyjne metody matematyczne są niewystarczające. Algorytmy genetyczne opierają się na operatorach inspirowanych biologią, takich jak mutacja, krzyżowanie i selekcja.
@@ -54,6 +56,7 @@ Algorytmy genetyczne mogą być użyte do rozwiązywania problemów, w których 
 ### Biblioteki
 
 - [Numpy](https://numpy.org/) >= 1.26.2
+- [Matplotlib](https://matplotlib.org/) >= 3.8.2
 
 ### Hiperparametry
 
@@ -86,6 +89,8 @@ Poniżej prezentuję przykład utworzenia początkowej populacji losowej ciągu 
 
 ```python
 # Wczytywanie używanej biblioteki
+import matplotlib.pyplot as plt
+import numpy as np
 from numpy.random import randint
 from numpy.random import rand
 ```
@@ -196,13 +201,14 @@ for i in range(0, n_pop, 2):
 Możemy połączyć to wszystko w funkcję o nazwie algorytm_genetyczny(), która pobiera nazwę funkcji celu oraz hiperparametry i zwraca najlepsze rozwiązanie znalezione podczas wyszukiwania.
 
 ```python
-# algorytm genetyczny
+#algorytm genetyczny
 def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 	# początkowa populacja losowego ciągu bitowego
 	pop = [randint(0, 2, n_bits).tolist() for _ in range(n_pop)]
 	# śledzenie najlepszego rozwiązania
 	best, best_eval = 0, cel(pop[0])
 	# wyliczanie pokoleń
+	historia = []
 	for gen in range(n_iter):
 		# ocena wszystkich kandydatów w populacji
 		wyniki = [cel(c) for c in pop]
@@ -211,6 +217,7 @@ def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 			if wyniki[i] < best_eval:
 				best, best_eval = pop[i], wyniki[i]
 				print(">%d, nowe najlepsze rozwiązanie f(%s) = %.3f" % (gen,  pop[i], wyniki[i]))
+				historia.append(best_eval)
 		# wybór rodziców
 		wybrani = [selekcja(pop, wyniki) for _ in range(n_pop)]
 		# stworzenie nowej generacji
@@ -225,7 +232,7 @@ def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 				dzieci.append(c)
 		# zastąpienie populacji
 		pop = dzieci
-	return [best, best_eval]
+	return [best, best_eval, historia]
 ```
 
 ### Przykład 1: One Max problem
@@ -242,6 +249,21 @@ Poniższa funkcja onemax() jako dane wejściowe pobiera ciąg bitów wartości c
 def onemax(x):
 	return -sum(x)
 ```
+
+Poniżej prezentuję wykres funkcji onemax.
+
+```python
+x_values = np.arange(-50, 51, 1)
+y_values = [onemax([x]) for x in x_values]
+plt.plot(x_values, y_values, linestyle='-')
+plt.title('Wykres funkcji onemax')
+plt.xlabel('Wartości zmiennej')
+plt.ylabel('Wartość funkcji onemax')
+plt.grid(True)
+plt.show()
+```
+
+![](onemax.png)
 
 Następnie możemy skonfigurować wyszukiwanie.
 
@@ -266,7 +288,7 @@ Następnie można wywołać wyszukiwanie i znaleźć najlepszy wynik.
 
 ```python
 # przeprowadzenie wyszukiwania algorytmu genetycznego
-best, score = algorytm_genetyczny(onemax, n_bits, n_iter, n_pop, r_cross, r_mut)
+best, score, historia = algorytm_genetyczny(onemax, n_bits, n_iter, n_pop, r_cross, r_mut)
 print('Znaleziono najlepsze rozwiązanie!')
 print('f(%s) = %f' % (best, score))
 ```
@@ -287,6 +309,19 @@ Znaleziono najlepsze rozwiązanie!
 f([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]) = -20.000000
 ```
 
+Poniżej prezentuję wykres historii najlepszego wyniku w każdej iteracji.
+
+```python
+plt.plot(range(len(historia)), historia, marker='o', linestyle='-', color='b')
+plt.title('Historia najlepszego wyniku w każdej iteracji')
+plt.xlabel('Iteracje')
+plt.ylabel('Najlepszy wynik')
+plt.grid(True)
+plt.show()
+```
+
+![](onemax_history.png)
+
 ### Przykład 2: Optymalizacja funkcji ciągłej
 
 Celem algorytmu genetycznego będzie znalezienie takich wartości zmiennych x, dla których funkcja celu przyjmuje możliwie najniższą wartość, co odpowiada minimalizacji tej funkcji. Funkcja celu ma wartosci optymalne przy f(0, 0) = 0,0.
@@ -296,6 +331,51 @@ Celem algorytmu genetycznego będzie znalezienie takich wartości zmiennych x, d
 def cel(x):
 	return x[0]**2.0 + x[1]**2.0
 ```
+
+Poniżej przedstawiam wykres funkcji celu.
+
+```python
+# Zakres wartości dla każdej zmiennej x i y
+x_values = np.linspace(-5, 5, 100)
+y_values = np.linspace(-5, 5, 100)
+
+# Utworzenie siatki punktów (x, y)
+X, Y = np.meshgrid(x_values, y_values)
+
+# Obliczenie wartości funkcji celu dla każdego punktu na siatce
+Z = cel([X, Y])
+
+# Tworzenie trójwymiarowego wykresu
+fig = plt.figure(figsize=(12, 5))
+
+# Dodawanie wykresu trójwymiarowego
+ax1 = fig.add_subplot(121, projection='3d')
+surface = ax1.plot_surface(X, Y, Z, cmap='viridis', label='Funkcja Celu')
+
+# Dodawanie etykiet i tytułu do wykresu trójwymiarowego
+ax1.set_xlabel('X')
+ax1.set_ylabel('Y')
+ax1.set_zlabel('Funkcja Celu')
+ax1.set_title('Widok 3D funkcji celu')
+
+# Dodawanie wykresu z lotu ptaka (widok z góry)
+ax2 = fig.add_subplot(122)
+contourf = ax2.contourf(X, Y, Z, cmap='viridis', levels=20)
+
+# Dodawanie etykiet i tytułu do wykresu z lotu ptaka
+ax2.set_xlabel('X')
+ax2.set_ylabel('Y')
+ax2.set_title('Widok z góry funkcji celu')
+
+# Dodawanie kolorowej mapy kolorów do wykresu z lotu ptaka
+cbar = fig.colorbar(contourf, ax=ax2)
+cbar.set_label('Funkcja Celu')
+
+# Wyświetlanie wykresów
+plt.show()
+```
+
+![](cfo_cel.png)
 
 Chcąc przeprowadzić optymalizację za pomocą algorytmu genetycznego, najpierw musimy zdefiniować granice każdej zmiennej wejściowej. Ten fragment kodu definiuje zakresy dla zmiennych decyzyjnych, czyli przedziały, w których algorytm będzie przeszukiwał wartości zmiennych. W tym konkretnym przypadku granice są ustawione dla dwóch zmiennych decyzyjnych, z zakresem od -5 do 5.
 
@@ -372,15 +452,6 @@ wyniki = [cel(d) for d in rozszyfrowane]
 Łącząc to razem, pełny przykład algorytmu genetycznego do optymalizacji funkcji ciągłej znajduje się poniżej.
 
 ```python
-# importowanie funkcji randint i rand z biblioteki numpy
-
-from numpy.random import randint
-from numpy.random import rand
-
-# funkcja celu
-def cel(x):
-	return x[0]**2.0 + x[1]**2.0
-
 # dekodowanie ciągu bitów na liczby
 def rozszyfruj(granice, n_bits, bitstring):
 	rozszyfrowane = list()
@@ -437,6 +508,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 	# śledzenie najlepszego rozwiązania
 	best, best_eval = 0, cel(rozszyfruj(granice, n_bits, pop[0]))
 	# wyliczanie pokoleń
+	historia=[]
 	for gen in range(n_iter):
 		# rozszyfrowanie populacji
 		rozszyfrowane = [rozszyfruj(granice, n_bits, p) for p in pop]
@@ -447,6 +519,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 			if wyniki[i] < best_eval:
 				best, best_eval = pop[i], wyniki[i]
 				print(">%d, nowe najlepsze rozwiązanie f(%s) = %f" % (gen,  rozszyfrowane[i], wyniki[i]))
+				historia.append(best_eval)
 		# wybór rodziców
 		wybrani = [selekcja(pop, wyniki) for _ in range(n_pop)]
 		# stworzenie nowej generacji
@@ -462,7 +535,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 				dzieci.append(c)
 		# zastąpienie populacji
 		pop = dzieci
-	return [best, best_eval]
+	return [best, best_eval, historia]
 
 # zakres
 granice = [[-5.0, 5.0], [-5.0, 5.0]]
@@ -477,7 +550,7 @@ r_cross = 0.9
 # współczynnik mutacji
 r_mut = 1.0 / (float(n_bits) * len(granice))
 # przeprowadzenie wyszukiwania algorytmu genetycznego
-best, score = algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut)
+best, score, historia = algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut)
 print('Koniec!')
 rozszyfrowane = rozszyfruj(granice, n_bits, best)
 print('f(%s) = %f' % (rozszyfrowane, score))
@@ -506,7 +579,18 @@ Koniec!
 f([0.0, 0.0]) = 0.000000
 ```
 
-![](public/fitness_function.png)
+Poniżej prezentuję wykres historii najlepszego wyniku w każdej iteracji.
+
+```python
+plt.plot(range(len(historia)), historia, marker='o', linestyle='-', color='b')
+plt.title('Historia najlepszego wyniku w każdej iteracji')
+plt.xlabel('Iteracje')
+plt.ylabel('Najlepszy wynik')
+plt.grid(True)
+plt.show()
+```
+
+![](cfo_history.png)
 
 ## Źródła
 

@@ -1,4 +1,5 @@
 # importowanie funkcji randint i rand z biblioteki numpy
+
 from numpy.random import randint
 from numpy.random import rand
 
@@ -62,6 +63,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 	# śledzenie najlepszego rozwiązania
 	best, best_eval = 0, cel(rozszyfruj(granice, n_bits, pop[0]))
 	# wyliczanie pokoleń
+	historia=[]
 	for gen in range(n_iter):
 		# rozszyfrowanie populacji
 		rozszyfrowane = [rozszyfruj(granice, n_bits, p) for p in pop]
@@ -72,6 +74,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 			if wyniki[i] < best_eval:
 				best, best_eval = pop[i], wyniki[i]
 				print(">%d, nowe najlepsze rozwiązanie f(%s) = %f" % (gen,  rozszyfrowane[i], wyniki[i]))
+				historia.append(best_eval)
 		# wybór rodziców
 		wybrani = [selekcja(pop, wyniki) for _ in range(n_pop)]
 		# stworzenie nowej generacji
@@ -87,7 +90,7 @@ def algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut):
 				dzieci.append(c)
 		# zastąpienie populacji
 		pop = dzieci
-	return [best, best_eval]
+	return [best, best_eval, historia]
 
 # zakres
 granice = [[-5.0, 5.0], [-5.0, 5.0]]
@@ -102,7 +105,7 @@ r_cross = 0.9
 # współczynnik mutacji
 r_mut = 1.0 / (float(n_bits) * len(granice))
 # przeprowadzenie wyszukiwania algorytmu genetycznego
-best, score = algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut)
+best, score, historia = algorytm_genetyczny(cel, granice, n_bits, n_iter, n_pop, r_cross, r_mut)
 print('Koniec!')
 rozszyfrowane = rozszyfruj(granice, n_bits, best)
 print('f(%s) = %f' % (rozszyfrowane, score))

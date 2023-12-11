@@ -1,6 +1,7 @@
 # Wczytywanie używanej biblioteki
 from numpy.random import randint
 from numpy.random import rand
+import numpy as np 
 
 # selekcja
 def selekcja(pop, wyniki, k=3):
@@ -40,6 +41,7 @@ def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 	# śledzenie najlepszego rozwiązania
 	best, best_eval = 0, cel(pop[0])
 	# wyliczanie pokoleń
+	historia = []
 	for gen in range(n_iter):
 		# ocena wszystkich kandydatów w populacji
 		wyniki = [cel(c) for c in pop]
@@ -48,6 +50,7 @@ def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 			if wyniki[i] < best_eval:
 				best, best_eval = pop[i], wyniki[i]
 				print(">%d, nowe najlepsze rozwiązanie f(%s) = %.3f" % (gen,  pop[i], wyniki[i]))
+				historia.append(best_eval)
 		# wybór rodziców
 		wybrani = [selekcja(pop, wyniki) for _ in range(n_pop)]
 		# stworzenie nowej generacji
@@ -62,7 +65,7 @@ def algorytm_genetyczny(cel, n_bits, n_iter, n_pop, r_krzyz, r_mut):
 				dzieci.append(c)
 		# zastąpienie populacji
 		pop = dzieci
-	return [best, best_eval]
+	return [best, best_eval, historia]
 
 # funkcja celu
 def onemax(x):
@@ -81,6 +84,7 @@ r_mut = 1.0 / float(n_bits)
 
 
 # przeprowadzenie wyszukiwania algorytmu genetycznego
-best, score = algorytm_genetyczny(onemax, n_bits, n_iter, n_pop, r_cross, r_mut)
+best, score, historia = algorytm_genetyczny(onemax, n_bits, n_iter, n_pop, r_cross, r_mut)
 print('Znaleziono najlepsze rozwiązanie!')
 print('f(%s) = %f' % (best, score))
+
