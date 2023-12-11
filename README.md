@@ -55,8 +55,8 @@ Algorytmy genetyczne mogą być użyte do rozwiązywania problemów, w których 
 
 ### Biblioteki
 
-- [Numpy](https://numpy.org/) >= 1.26.2
-- [Matplotlib](https://matplotlib.org/) >= 3.8.2
+- [Numpy](https://numpy.org/) : 1.26.2
+- [Matplotlib](https://matplotlib.org/) : 3.8.2
 
 ### Hiperparametry
 
