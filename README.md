@@ -28,7 +28,7 @@ Projekt wykonany na przedmiot Podstawy Programowania w Pythonie przez Mateusza K
 
 Algorytm genetyczny powtarza te kroki przez określoną liczbę iteracji lub do momentu spełnienia pewnych warunków zakończenia. Warunki te mogą obejmować osiągnięcie określonej wartości funkcji przystosowania, przekroczenie maksymalnej liczby generacji, czy innych kryteriów zakończenia.
 
-![](genetic-algo.jpg)
+![](plots/genetic-algo.jpg)
 
 ### Zastosowania
 
@@ -263,7 +263,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![](onemax.png)
+![](plots/onemax.png)
 
 Następnie możemy skonfigurować wyszukiwanie.
 
@@ -320,7 +320,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![](onemax_history.png)
+![](plots/onemax_history.png)
 
 ### Przykład 2: Optymalizacja funkcji ciągłej
 
@@ -375,7 +375,7 @@ cbar.set_label('Funkcja Celu')
 plt.show()
 ```
 
-![](cfo_cel.png)
+![](plots/cfo_cel.png)
 
 Chcąc przeprowadzić optymalizację za pomocą algorytmu genetycznego, najpierw musimy zdefiniować granice każdej zmiennej wejściowej. Ten fragment kodu definiuje zakresy dla zmiennych decyzyjnych, czyli przedziały, w których algorytm będzie przeszukiwał wartości zmiennych. W tym konkretnym przypadku granice są ustawione dla dwóch zmiennych decyzyjnych, z zakresem od -5 do 5.
 
@@ -590,7 +590,7 @@ plt.grid(True)
 plt.show()
 ```
 
-![](cfo_history.png)
+![](plots/cfo_history.png)
 
 ## Źródła
 
